@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+  <style>
+    body { margin: 0; background: #fafafa; }
+    .topbar { display: none; }
+    .header {
+      background: linear-gradient(135deg, #2d6a4f 0%, #40916c 100%);
+      color: #fff;
+      padding: 1.25rem 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .header h1 { margin: 0 0 0.25rem; font-size: 1.5rem; font-weight: 600; }
+    .header p { margin: 0; opacity: 0.9; font-size: 0.95rem; }
+    #swagger-ui { max-width: 1460px; margin: 0 auto; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1><%= title %></h1>
+    <p><%= description %></p>
+  </header>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js" crossorigin></script>
+  <script>
+    window.onload = function () {
+      SwaggerUIBundle({
+        url: '<%= swaggerJsonUrl %>',
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset,
+        ],
+        layout: 'BaseLayout',
+        defaultModelsExpandDepth: 1,
+        docExpansion: 'list',
+      });
+    };
+  </script>
+</body>
+</html>

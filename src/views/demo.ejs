@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grow — Demo</title>
+  <style>
+    :root {
+      --green-dark: #1b4332;
+      --green: #40916c;
+      --green-light: #d8f3dc;
+      --sky: #90e0ef;
+      --night: #1d3557;
+      --soil: #bc6c25;
+      --card: #fff;
+      --muted: #6c757d;
+      --warn: #e9c46a;
+      --err: #e76f51;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(180deg, var(--sky) 0%, #caf0f8 35%, var(--green-light) 100%);
+      min-height: 100vh;
+      color: #212529;
+    }
+    body.night {
+      background: linear-gradient(180deg, #1d3557 0%, #457b9d 50%, #2d6a4f 100%);
+      color: #f1faee;
+    }
+    body.night .card { background: rgba(255,255,255,0.95); color: #212529; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 1rem 1.25rem 2rem; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    header h1 { margin: 0; font-size: 1.75rem; color: var(--green-dark); }
+    body.night header h1 { color: #f1faee; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--green);
+      color: #fff;
+    }
+    .badge.night { background: var(--night); }
+    .badge.warn { background: var(--warn); color: #333; }
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    .alert.ok { background: #b7e4c7; border: 1px solid var(--green); }
+    .alert.err { background: #ffddd2; border: 1px solid var(--err); color: #9d0208; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      margin: 0 0 1rem;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--green-dark);
+    }
+    .plant-hero {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .plant-emoji { font-size: 4rem; line-height: 1; }
+    .plant-name { font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0 0.25rem; }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin: 0.35rem 0;
+    }
+    .bar {
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      background: var(--green);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    .bar.warn > span { background: var(--warn); }
+    .sun-dial {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: conic-gradient(#ffe66d 0deg, #ffd93d 90deg, #f4a261 180deg, #e9c46a 270deg, #ffe66d 360deg);
+      position: relative;
+      border: 3px solid var(--green-dark);
+    }
+    body.night .sun-dial { opacity: 0.5; filter: grayscale(0.4); }
+    .sun-dial::after {
+      content: '☀️';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+    }
+    .sun-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      margin: -6px 0 0 -6px;
+      transform-origin: center center;
+    }
+    .sun-marker.optimal { background: #2d6a4f; box-shadow: 0 0 0 3px #fff; z-index: 2; }
+    .sun-marker.player { background: #e76f51; box-shadow: 0 0 0 3px #fff; z-index: 3; }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .check { font-size: 1.1rem; }
+    form { margin-top: 0.75rem; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.25rem; }
+    input[type="text"], input[type="number"], input[type="range"] {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+    button, .btn {
+      display: inline-block;
+      padding: 0.55rem 1rem;
+      background: var(--green-dark);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    button:hover, .btn:hover { background: var(--green); }
+    button.secondary { background: #6c757d; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .empty {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .empty .plant-emoji { font-size: 3rem; }
+    footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    body.night footer { color: #a8dadc; }
+    footer a { color: var(--green-dark); }
+    body.night footer a { color: #95d5b2; }
+    .tick {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 0.5rem;
+    }
+    .align-value { font-weight: 700; color: var(--green-dark); }
+  </style>
+</head>
+<body class="<%= world.isDaytime ? '' : 'night' %>">
+  <div class="wrap">
+    <header>
+      <h1>🌿 Grow</h1>
+      <div>
+        <span class="badge <%= world.isDaytime ? '' : 'night' %>"><%= world.isDaytime ? '☀️ Day' : '🌙 Night' %></span>
+        <span class="badge"><%= world.season %> ×<%= world.seasonModifier %></span>
+        <span class="badge warn">tick <%= Math.floor((world.dayProgress || 0) * 24) %>:00</span>
+      </div>
+    </header>
+
+    <% if (msg) { %><div class="alert ok"><%= msg %></div><% } %>
+    <% if (err) { %><div class="alert err"><%= err %></div><% } %>
+
+    <% if (!hasPlant) { %>
+      <div class="card empty">
+        <div class="plant-emoji">🌰</div>
+        <h2>Start your garden</h2>
+        <p>No plant yet. Plant a seed to begin the simulation.</p>
+        <form method="post" action="/demo/create">
+          <label>Plant name</label>
+          <input type="text" name="name" placeholder="e.g. Willow" value="Seedling" />
+          <button type="submit">Plant seed</button>
+        </form>
+        <p class="tick">Growth runs automatically every minute via cron.</p>
+      </div>
+    <% } else { %>
+      <div class="grid">
+        <!-- Plant -->
+        <div class="card">
+          <h2>Your plant</h2>
+          <div class="plant-hero">
+            <div class="plant-emoji"><%= plantEmoji %></div>
+            <div class="plant-name"><%= status.plant.name %></div>
+            <div>Level <strong><%= status.plant.level %></strong></div>
+          </div>
+          <div class="stat-row"><span>Growth points</span><strong><%= Math.round(status.plant.growthPoints) %></strong></div>
+          <div class="bar"><span style="width:<%= Math.min(100, (status.plant.growthPoints / status.growth.nextLevelAt) * 100) %>%"></span></div>
+          <div class="stat-row" style="margin-top:0.5rem"><span>Next level</span><span><%= Math.round(status.growth.pointsToNextLevel) %> pts left</span></div>
+
+          <div class="stat-row" style="margin-top:1rem"><span>Health</span><span><%= Math.round(status.plant.health) %>%</span></div>
+          <div class="bar"><span style="width:<%= status.plant.health %>%"></span></div>
+
+          <div class="stat-row" style="margin-top:0.75rem"><span>Hydration</span><span><%= Math.round(status.plant.hydration) %>%</span></div>
+          <div class="bar <%= status.plant.hydration > 85 ? 'warn' : '' %>"><span style="width:<%= status.plant.hydration %>%"></span></div>
+        </div>
+
+        <!-- Sun -->
+        <div class="card">
+          <h2>Sunlight</h2>
+          <div class="sun-dial" id="sunDial">
+            <div class="sun-marker optimal" id="optimalMarker"></div>
+            <div class="sun-marker player" id="playerMarker"></div>
+          </div>
+          <div class="stat-row"><span>Alignment</span><strong><%= status.sun.alignmentLabel %></strong></div>
+          <div class="stat-row"><span>Growth multiplier</span><strong>×<%= status.sun.growthMultiplier %></strong></div>
+          <div class="stat-row"><span>Intensity</span><span><%= Math.round((status.sun.sunlightIntensity || 0) * 100) %>%</span></div>
+
+          <form method="post" action="/demo/align-sun">
+            <label>Align sun <span class="align-value" id="angleLabel"><%= Math.round(status.sun.playerAlignment) %>°</span></label>
+            <input type="range" name="angle" min="0" max="360" value="<%= Math.round(status.sun.playerAlignment) %>" id="angleSlider" />
+            <button type="submit">Align</button>
+          </form>
+          <p class="tick">Optimal: <%= Math.round(status.sun.optimalSunAngle) %>° · Sun at <%= Math.round(status.sun.sunAngle) %>°</p>
+        </div>
+
+        <!-- Resources -->
+        <div class="card">
+          <h2>Resources</h2>
+          <div class="stat-row"><span>Water tank</span><span><%= Math.round(status.water.currentWater) %> / <%= status.water.maxWater %></span></div>
+          <div class="bar"><span style="width:<%= (status.water.currentWater / status.water.maxWater) * 100 %>%"></span></div>
+
+          <% const refillMin = Math.ceil((status.water.msUntilRefill || 0) / 60000); %>
+          <p class="tick">
+            <% if (status.water.currentWater >= status.water.maxWater) { %>
+              Tank full · refills every 10 min when used
+            <% } else if (status.water.currentWater > 0) { %>
+              Max pour now: <strong><%= Math.round(status.water.currentWater) %></strong> · full refill in ~<%= refillMin %> min
+            <% } else { %>
+              Tank empty · full refill in ~<%= refillMin %> min
+            <% } %>
+          </p>
+
+          <form method="post" action="/demo/water" style="margin-top:0.75rem">
+            <label>Water amount (max <%= Math.max(1, Math.round(status.water.currentWater)) %> now)</label>
+            <input type="number" name="amount" min="1" max="<%= Math.max(1, Math.round(status.water.currentWater)) %>" value="<%= Math.min(25, Math.max(1, Math.round(status.water.currentWater))) %>" />
+            <button type="submit" <%= status.water.currentWater <= 0 ? 'disabled' : '' %>>💧 Water plant</button>
+          </form>
+
+          <hr style="border:none;border-top:1px solid #eee;margin:1rem 0" />
+
+          <div class="stat-row"><span>Fertilizer on ground</span><strong><%= Math.round(status.fertilizer.availableFertilizer) %></strong></div>
+          <div class="stat-row"><span>Growth boost</span><strong><%= status.fertilizer.boostActive ? 'Active ×' + status.fertilizer.boostMultiplier : 'Inactive' %></strong></div>
+          <% if (status.fertilizer.boostExpiresAt) { %>
+            <p class="tick">Boost until <%= new Date(status.fertilizer.boostExpiresAt).toLocaleTimeString() %></p>
+          <% } %>
+
+          <form method="post" action="/demo/collect-fertilizer">
+            <button type="submit" <%= status.fertilizer.availableFertilizer <= 0 ? 'disabled' : '' %>>🐑 Collect fertilizer</button>
+          </form>
+          <% if (world.fertilizer && world.fertilizer.nextSheepVisit) { %>
+            <p class="tick">Next sheep ~ <%= new Date(world.fertilizer.nextSheepVisit).toLocaleTimeString() %></p>
+          <% } %>
+        </div>
+
+        <!-- Growth conditions -->
+        <div class="card">
+          <h2>Growth this cycle</h2>
+          <p style="font-size:0.9rem;color:var(--muted);margin:0 0 0.75rem">
+            All conditions must pass for the minute tick to add growth points.
+          </p>
+          <ul class="checklist">
+            <% growthChecklist.forEach(function(item) { %>
+              <li>
+                <span class="check"><%= item.ok ? '✅' : '⬜' %></span>
+                <span>
+                  <strong><%= item.label %></strong><br />
+                  <small><%= item.hint %></small>
+                </span>
+              </li>
+            <% }); %>
+          </ul>
+          <div class="actions" style="margin-top:1rem">
+            <a href="/" class="btn">↻ Refresh</a>
+            <a href="/docs" class="btn secondary">API docs</a>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <footer>
+      <p>Simulation updates every <strong>1 minute</strong> · <a href="/api">Swagger</a> · <a href="/docs">OpenAPI UI</a></p>
+      <p class="tick" id="countdown">Auto-refresh in 20s</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var optimal = <%= status ? status.sun.optimalSunAngle : 90 %>;
+      var player = <%= status ? status.sun.playerAlignment : 0 %>;
+
+      function placeMarker(el, deg) {
+        if (!el) return;
+        var r = 70;
+        var rad = (deg - 90) * Math.PI / 180;
+        el.style.transform = 'rotate(' + deg + 'deg) translateY(-' + r + 'px)';
+      }
+
+      placeMarker(document.getElementById('optimalMarker'), optimal);
+      placeMarker(document.getElementById('playerMarker'), player);
+
+      var slider = document.getElementById('angleSlider');
+      var label = document.getElementById('angleLabel');
+      var playerMarker = document.getElementById('playerMarker');
+      if (slider) {
+        slider.addEventListener('input', function () {
+          var v = parseInt(slider.value, 10);
+          label.textContent = v + '°';
+          placeMarker(playerMarker, v);
+        });
+      }
+
+      var sec = 20;
+      var cd = document.getElementById('countdown');
+      setInterval(function () {
+        sec--;
+        if (cd) cd.textContent = 'Auto-refresh in ' + sec + 's';
+        if (sec <= 0) location.reload();
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>
