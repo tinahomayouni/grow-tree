@@ -135,8 +135,10 @@ export class DemoController {
           status.fertilizer.boostActive ||
           status.fertilizer.availableFertilizer > 0,
         hint: status.fertilizer.boostActive
-          ? 'Boost active'
-          : `${Math.round(status.fertilizer.availableFertilizer)} on ground`,
+          ? `Boost ×${status.fertilizer.boostMultiplier} (${status.fertilizer.boostMinutesLeft} min left)`
+          : status.fertilizer.availableFertilizer > 0
+            ? `${Math.round(status.fertilizer.availableFertilizer)} on ground — collect it`
+            : `Wait for sheep (~${status.fertilizer.minutesUntilSheep} min)`,
       },
     ];
   }

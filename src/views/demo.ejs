@@ -205,6 +205,11 @@
 
     <% if (msg) { %><div class="alert ok"><%= msg %></div><% } %>
     <% if (err) { %><div class="alert err"><%= err %></div><% } %>
+    <% if (hasPlant && !world.isDaytime) { %>
+      <div class="alert" style="background:#dfe7fd;border:1px solid #4a6fa5">
+        🌙 <strong>Night</strong> — plants do not grow now. Fertilizer boost is saved for daytime.
+      </div>
+    <% } %>
 
     <% if (!hasPlant) { %>
       <div class="card empty">
@@ -283,17 +288,32 @@
 
           <hr style="border:none;border-top:1px solid #eee;margin:1rem 0" />
 
-          <div class="stat-row"><span>Fertilizer on ground</span><strong><%= Math.round(status.fertilizer.availableFertilizer) %></strong></div>
-          <div class="stat-row"><span>Growth boost</span><strong><%= status.fertilizer.boostActive ? 'Active ×' + status.fertilizer.boostMultiplier : 'Inactive' %></strong></div>
-          <% if (status.fertilizer.boostExpiresAt) { %>
-            <p class="tick">Boost until <%= new Date(status.fertilizer.boostExpiresAt).toLocaleTimeString() %></p>
+          <p style="font-size:0.85rem;color:var(--muted);margin:0 0 0.75rem">
+            Sheep drop fertilizer on the ground. <strong>Collect</strong> moves it into a timed growth boost on your plant.
+          </p>
+
+          <div class="stat-row"><span>On ground (not collected)</span><strong><%= Math.round(status.fertilizer.availableFertilizer) %></strong></div>
+          <div class="stat-row"><span>Plant boost (after collect)</span>
+            <strong><%= status.fertilizer.boostActive ? '×' + status.fertilizer.boostMultiplier + ' · ' + status.fertilizer.boostMinutesLeft + ' min left' : 'None' %></strong>
+          </div>
+
+          <% if (status.fertilizer.boostActive) { %>
+            <p class="tick" style="color:var(--green-dark)">
+              ✓ Boost is active — ground can be 0. Growth uses the boost, not the pile on the ground.
+            </p>
+          <% } else if (status.fertilizer.availableFertilizer <= 0) { %>
+            <p class="tick">No boost yet. Wait for sheep (~<%= status.fertilizer.minutesUntilSheep %> min) or refresh after they visit.</p>
           <% } %>
 
           <form method="post" action="/demo/collect-fertilizer">
-            <button type="submit" <%= status.fertilizer.availableFertilizer <= 0 ? 'disabled' : '' %>>🐑 Collect fertilizer</button>
+            <button type="submit" <%= status.fertilizer.availableFertilizer <= 0 ? 'disabled' : '' %>>
+              🐑 Collect <%= Math.round(status.fertilizer.availableFertilizer) %> fertilizer
+            </button>
           </form>
-          <% if (world.fertilizer && world.fertilizer.nextSheepVisit) { %>
-            <p class="tick">Next sheep ~ <%= new Date(world.fertilizer.nextSheepVisit).toLocaleTimeString() %></p>
+          <% if (status.fertilizer.availableFertilizer <= 0 && !status.fertilizer.boostActive) { %>
+            <p class="tick">Next sheep in ~<%= status.fertilizer.minutesUntilSheep %> min</p>
+          <% } else if (status.fertilizer.availableFertilizer <= 0 && status.fertilizer.boostActive) { %>
+            <p class="tick">Next sheep drop in ~<%= status.fertilizer.minutesUntilSheep %> min (boost still counts for growth)</p>
           <% } %>
         </div>
 

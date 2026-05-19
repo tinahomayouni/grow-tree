@@ -8,8 +8,10 @@ export interface FertilizerStatus {
   boostActive: boolean;
   boostExpiresAt: Date | null;
   boostMultiplier: number;
+  boostMinutesLeft: number;
   sheepPresent: boolean;
   nextSheepVisit: Date | null;
+  minutesUntilSheep: number;
 }
 
 @Injectable()
@@ -61,13 +63,28 @@ export class FertilizerService {
 
   getStatus(world: WorldEntity, plant: PlantEntity | null): FertilizerStatus {
     const boostActive = plant ? this.isBoostActive(plant) : false;
+    const boostExpiresAt = boostActive ? plant!.fertilizerBoostUntil : null;
+    const boostMinutesLeft = boostExpiresAt
+      ? Math.max(0, Math.ceil((boostExpiresAt.getTime() - Date.now()) / 60000))
+      : 0;
+    const minutesUntilSheep = world.nextSheepVisit
+      ? Math.max(
+          0,
+          Math.ceil(
+            (world.nextSheepVisit.getTime() - Date.now()) / 60000,
+          ),
+        )
+      : 0;
+
     return {
       availableFertilizer: world.availableFertilizer,
       boostActive,
-      boostExpiresAt: boostActive ? plant!.fertilizerBoostUntil : null,
+      boostExpiresAt,
       boostMultiplier: boostActive ? FERTILIZER.BOOST_MULTIPLIER : 1,
+      boostMinutesLeft,
       sheepPresent: world.sheepPresent,
       nextSheepVisit: world.nextSheepVisit,
+      minutesUntilSheep,
     };
   }
 

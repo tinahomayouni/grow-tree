@@ -27,8 +27,9 @@ export const FERTILIZER = {
   DECAY_PER_CYCLE: 2,
   SPAWN_AMOUNT_MIN: 10,
   SPAWN_AMOUNT_MAX: 30,
-  SHEEP_MIN_INTERVAL_MS: 20 * 60 * 1000,
-  SHEEP_MAX_INTERVAL_MS: 40 * 60 * 1000,
+  /** Sheep visits (shorter for demo) */
+  SHEEP_MIN_INTERVAL_MS: 3 * 60 * 1000,
+  SHEEP_MAX_INTERVAL_MS: 6 * 60 * 1000,
 } as const;
 
 export const GROWTH = {

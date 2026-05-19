@@ -22,9 +22,12 @@ export class WorldService {
 
   async getStatus(plant: PlantEntity | null) {
     const world = await this.getWorld();
-    if (this.waterService.refillIfNeeded(world)) {
-      await this.worldRepository.save(world);
-    }
+    let dirty = false;
+    if (this.waterService.refillIfNeeded(world)) dirty = true;
+    const fertilizerBefore = world.availableFertilizer;
+    this.fertilizerService.processSheepEvents(world);
+    if (world.availableFertilizer !== fertilizerBefore) dirty = true;
+    if (dirty) await this.worldRepository.save(world);
     return {
       sun: this.sunlightService.getStatus(world, plant),
       water: this.waterService.getStatus(world, plant),
