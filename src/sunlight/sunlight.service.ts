@@ -11,7 +11,7 @@ export interface SunlightStatus {
   alignmentDelta: number;
   sunlightIntensity: number;
   growthMultiplier: number;
-  alignmentLabel: 'perfect' | 'partial' | 'wrong';
+  alignmentLabel: 'perfect' | 'partial' | 'wrong' | 'night';
   isDaytime: boolean;
 }
 
@@ -51,18 +51,16 @@ export class SunlightService {
       alignmentDelta: delta,
       sunlightIntensity: world.sunlightIntensity,
       growthMultiplier,
-      alignmentLabel: this.alignmentLabel(delta),
+      alignmentLabel: world.isDaytime
+        ? this.alignmentLabel(delta)
+        : 'night',
       isDaytime: world.isDaytime,
     };
   }
 
   growthMultiplier(delta: number): number {
-    if (delta <= SUN.PERFECT_THRESHOLD) {
-      return SUN.PERFECT_MULTIPLIER;
-    }
-    if (delta <= SUN.PARTIAL_THRESHOLD) {
-      return SUN.PARTIAL_MULTIPLIER;
-    }
+    if (delta <= SUN.PERFECT_THRESHOLD) return SUN.PERFECT_MULTIPLIER;
+    if (delta <= SUN.PARTIAL_THRESHOLD) return SUN.PARTIAL_MULTIPLIER;
     return SUN.WRONG_MULTIPLIER;
   }
 

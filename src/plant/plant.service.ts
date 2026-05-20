@@ -137,11 +137,8 @@ export class PlantService {
     const sun = this.sunlightService.getStatus(world, plant);
     const sunlightBonus = sun.growthMultiplier;
     const waterBonus = this.waterService.waterBonus(plant);
-    const fertilizerBonus = this.fertilizerService.fertilizerBonus(
-      plant,
-      world,
-    );
-
+    const fertilizerBonus = this.fertilizerService.fertilizerBonus(plant, world);
+  
     const canGrow =
       world.isDaytime &&
       sunlightBonus > 0 &&
@@ -149,13 +146,17 @@ export class PlantService {
       fertilizerBonus > 0 &&
       this.waterService.hasWaterForGrowth(plant, world) &&
       this.fertilizerService.hasFertilizerForGrowth(plant, world);
-
+  
     if (!canGrow) {
       this.waterService.decayHydration(plant);
+      // health فقط روز کم می‌شه — شب گیاه استراحت می‌کنه
+      if (world.isDaytime) {
+        plant.health = Math.max(0, plant.health - GROWTH.HEALTH_DECAY_PER_CYCLE);
+      }
       await this.plantRepository.save(plant);
       return { grew: false, points: 0 };
     }
-
+  
     const seasonModifier = this.worldService.getSeasonModifier(world);
     const points =
       GROWTH.BASE_POINTS_PER_CYCLE *
@@ -163,15 +164,16 @@ export class PlantService {
       waterBonus *
       fertilizerBonus *
       seasonModifier;
-
+  
     plant.growthPoints += points;
     plant.level = this.levelForPoints(plant.growthPoints);
+    // رشد موفق = health بازیابی جزئی
+    plant.health = Math.min(GROWTH.MAX_HEALTH, plant.health + GROWTH.HEALTH_RECOVERY_PER_CYCLE);
     this.waterService.decayHydration(plant);
     await this.plantRepository.save(plant);
-
+  
     return { grew: true, points };
   }
-
   private levelForPoints(points: number): number {
     let level = 1;
     for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
