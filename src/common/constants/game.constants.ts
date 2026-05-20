@@ -37,7 +37,7 @@ export const GROWTH = {
   MIN_HEALTH: 0,
   MAX_HEALTH: 100,
   HEALTH_DECAY_PER_CYCLE: 2,      
-  HEALTH_RECOVERY_PER_CYCLE: 0.5,
+  HEALTH_RECOVERY_PER_CYCLE: 2,
 } as const;
 
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;

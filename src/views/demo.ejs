@@ -238,7 +238,9 @@
           <div class="stat-row" style="margin-top:0.5rem"><span>Next level</span><span><%= Math.round(status.growth.pointsToNextLevel) %> pts left</span></div>
 
           <div class="stat-row" style="margin-top:1rem"><span>Health</span><span><%= Math.round(status.plant.health) %>%</span></div>
-          <div class="bar"><span style="width:<%= status.plant.health %>%"></span></div>
+          <div class="bar <%= status.plant.health < 30 ? 'warn' : '' %>">
+            <span style="width:<%= Math.min(100, Math.max(0, status.plant.health)) %>%"></span>
+          </div>
 
           <div class="stat-row" style="margin-top:0.75rem"><span>Hydration</span><span><%= Math.round(status.plant.hydration) %>%</span></div>
           <div class="bar <%= status.plant.hydration > 85 ? 'warn' : '' %>"><span style="width:<%= status.plant.hydration %>%"></span></div>
