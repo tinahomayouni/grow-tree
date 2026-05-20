@@ -25,11 +25,11 @@ export const FERTILIZER = {
   BOOST_MULTIPLIER: 1.5,
   BOOST_DURATION_MS: 30 * 60 * 1000,
   DECAY_PER_CYCLE: 2,
-  SPAWN_AMOUNT_MIN: 10,
-  SPAWN_AMOUNT_MAX: 30,
-  /** Sheep visits (shorter for demo) */
-  SHEEP_MIN_INTERVAL_MS: 3 * 60 * 1000,
-  SHEEP_MAX_INTERVAL_MS: 6 * 60 * 1000,
+  SPAWN_AMOUNT_MIN: 6,
+  SPAWN_AMOUNT_MAX: 14,
+  /** Sheep visits (rarer for retention gameplay) */
+  SHEEP_MIN_INTERVAL_MS: 20 * 60 * 1000,
+  SHEEP_MAX_INTERVAL_MS: 45 * 60 * 1000,
 } as const;
 
 export const GROWTH = {
