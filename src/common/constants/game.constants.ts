@@ -37,12 +37,12 @@ export const GROWTH = {
   HEALTH_DECAY_PER_CYCLE: 2,
 
   // health recovery sources
-  HEALTH_FROM_WATER: 3,         // هر بار آب دادن
-  HEALTH_FROM_GROWTH: 1,        // هر سیکل رشد موفق
-  HEALTH_BONUS_DAYTIME: 1,      // اگه روز باشه
-  HEALTH_BONUS_FERTILIZER: 1,   // اگه boost فعال باشه
-  HEALTH_BONUS_SUN_PERFECT: 3,  // sun alignment perfect (بیشترین)
-  HEALTH_BONUS_SUN_PARTIAL: 1,  // sun alignment partial
+  HEALTH_FROM_WATER: 20,         // هر بار آب دادن
+  HEALTH_FROM_GROWTH: 10,        // هر سیکل رشد موفق
+  HEALTH_BONUS_DAYTIME: 10 ,      // اگه روز باشه
+  HEALTH_BONUS_FERTILIZER: 10,   // اگه boost فعال باشه
+  HEALTH_BONUS_SUN_PERFECT: 30,  // sun alignment perfect (بیشترین)
+  HEALTH_BONUS_SUN_PARTIAL: 10,  // sun alignment partial
 } as const;
 
 export const WORLD = {
