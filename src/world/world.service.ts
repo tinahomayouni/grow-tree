@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SEASON_MODIFIERS, SEASONS, Season } from '../common/constants/game.constants';
+import { SEASON_MODIFIERS, SEASONS, Season, WORLD } from '../common/constants/game.constants';
 import { FertilizerService } from '../fertilizer/fertilizer.service';
 import { PlantEntity } from '../plant/entities/plant.entity';
 import { SunlightService } from '../sunlight/sunlight.service';
@@ -64,5 +64,15 @@ export class WorldService {
       const idx = SEASONS.indexOf(world.season);
       world.season = SEASONS[(idx + 1) % SEASONS.length] as Season;
     }
+  }
+  async heartbeat(): Promise<void> {
+    const world = await this.getWorld();
+    world.lastHeartbeatAt = Date.now();
+    await this.worldRepository.save(world);
+  }
+  
+  isUserOnline(world: WorldEntity): boolean {
+    if (!world.lastHeartbeatAt) return false;
+    return Date.now() - Number(world.lastHeartbeatAt) < WORLD.HEARTBEAT_TIMEOUT_MS;
   }
 }

@@ -11,7 +11,6 @@ export const SUN = {
 
 export const WATER = {
   MAX: 100,
-  /** Full tank refill interval (10 min — shorter for demo; was 1 hour) */
   REFILL_INTERVAL_MS: 10 * 60 * 1000,
   WATERING_AMOUNT: 25,
   HYDRATION_MAX: 100,
@@ -27,7 +26,6 @@ export const FERTILIZER = {
   DECAY_PER_CYCLE: 2,
   SPAWN_AMOUNT_MIN: 6,
   SPAWN_AMOUNT_MAX: 14,
-  /** Sheep visits (rarer for retention gameplay) */
   SHEEP_MIN_INTERVAL_MS: 20 * 60 * 1000,
   SHEEP_MAX_INTERVAL_MS: 45 * 60 * 1000,
 } as const;
@@ -36,8 +34,20 @@ export const GROWTH = {
   BASE_POINTS_PER_CYCLE: 10,
   MIN_HEALTH: 0,
   MAX_HEALTH: 100,
-  HEALTH_DECAY_PER_CYCLE: 2,      
-  HEALTH_RECOVERY_PER_CYCLE: 2,
+  HEALTH_DECAY_PER_CYCLE: 2,
+
+  // health recovery sources
+  HEALTH_FROM_WATER: 3,         // هر بار آب دادن
+  HEALTH_FROM_GROWTH: 1,        // هر سیکل رشد موفق
+  HEALTH_BONUS_DAYTIME: 1,      // اگه روز باشه
+  HEALTH_BONUS_FERTILIZER: 1,   // اگه boost فعال باشه
+  HEALTH_BONUS_SUN_PERFECT: 3,  // sun alignment perfect (بیشترین)
+  HEALTH_BONUS_SUN_PARTIAL: 1,  // sun alignment partial
+} as const;
+
+export const WORLD = {
+  // کاربر تا ۲ دقیقه پیش heartbeat زده = online
+  HEARTBEAT_TIMEOUT_MS: 2 * 60 * 1000,
 } as const;
 
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;

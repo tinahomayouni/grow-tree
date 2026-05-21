@@ -149,9 +149,11 @@ export class PlantService {
   
     if (!canGrow) {
       this.waterService.decayHydration(plant);
-      // health فقط روز کم می‌شه — شب گیاه استراحت می‌کنه
       if (world.isDaytime) {
-        plant.health = Math.max(0, plant.health - GROWTH.HEALTH_DECAY_PER_CYCLE);
+        plant.health = Math.max(
+          GROWTH.MIN_HEALTH,
+          plant.health - GROWTH.HEALTH_DECAY_PER_CYCLE,
+        );
       }
       await this.plantRepository.save(plant);
       return { grew: false, points: 0 };
@@ -167,9 +169,16 @@ export class PlantService {
   
     plant.growthPoints += points;
     plant.level = this.levelForPoints(plant.growthPoints);
-    // رشد موفق = health بازیابی جزئی
-    plant.health = Math.min(GROWTH.MAX_HEALTH, plant.health + GROWTH.HEALTH_RECOVERY_PER_CYCLE);
     this.waterService.decayHydration(plant);
+  
+    // health recovery — هر شرط جداگانه جمع می‌شه
+    let healthGain = GROWTH.HEALTH_FROM_GROWTH;
+    if (world.isDaytime) healthGain += GROWTH.HEALTH_BONUS_DAYTIME;
+    if (fertilizerBonus > 1) healthGain += GROWTH.HEALTH_BONUS_FERTILIZER;
+    if (sun.alignmentLabel === 'perfect') healthGain += GROWTH.HEALTH_BONUS_SUN_PERFECT;
+    else if (sun.alignmentLabel === 'partial') healthGain += GROWTH.HEALTH_BONUS_SUN_PARTIAL;
+  
+    plant.health = Math.min(GROWTH.MAX_HEALTH, plant.health + healthGain);
     await this.plantRepository.save(plant);
   
     return { grew: true, points };

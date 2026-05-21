@@ -149,4 +149,9 @@ export class DemoController {
     if (level >= 2) return '🪴';
     return '🌱';
   }
+  @Post('world/heartbeat')
+async heartbeat() {
+  await this.worldService.heartbeat();
+  return { ok: true };
+}
 }

@@ -50,4 +50,10 @@ export class WorldEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   lastUpdatedAt: Date;
+
+  @Column({ type: 'bigint', default: 0 })
+  lastHeartbeatAt: number;
+
+  @Column({ type: 'bigint', default: 0 })
+  nextSheepAt: number;
 }

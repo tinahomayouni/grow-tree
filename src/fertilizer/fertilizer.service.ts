@@ -111,4 +111,22 @@ export class FertilizerService {
           FERTILIZER.SHEEP_MIN_INTERVAL_MS);
     return new Date(Date.now() + delay);
   }
+
+  trySpawnSheep(world: WorldEntity, isUserOnline: boolean): void {
+    if (!isUserOnline) return; // کاربر نیست، sheep نمیاد
+  
+    const now = Date.now();
+    if (now < world.nextSheepAt) return;
+  
+    const amount =
+      FERTILIZER.SPAWN_AMOUNT_MIN +
+      Math.random() * (FERTILIZER.SPAWN_AMOUNT_MAX - FERTILIZER.SPAWN_AMOUNT_MIN);
+  
+    world.availableFertilizer += amount;
+    world.nextSheepAt =
+      now +
+      FERTILIZER.SHEEP_MIN_INTERVAL_MS +
+      Math.random() *
+        (FERTILIZER.SHEEP_MAX_INTERVAL_MS - FERTILIZER.SHEEP_MIN_INTERVAL_MS);
+  }
 }
