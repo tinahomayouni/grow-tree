@@ -110,7 +110,20 @@ export class PlantService {
 
   async alignSun(dto: AlignSunDto) {
     const plant = await this.getPlant();
+    const world = await this.worldService.getWorld();
+  
     plant.playerSunAlignment = normalizeAngle(dto.angle);
+  
+    // health bonus فوری از sun alignment
+    const sun = this.sunlightService.getStatus(world, plant);
+    let healthDelta = 0;
+    if (sun.alignmentLabel === 'perfect') healthDelta = GROWTH.HEALTH_BONUS_SUN_PERFECT;
+    else if (sun.alignmentLabel === 'partial') healthDelta = GROWTH.HEALTH_BONUS_SUN_PARTIAL;
+  
+    if (healthDelta > 0) {
+      plant.health = Math.min(GROWTH.MAX_HEALTH, plant.health + healthDelta);
+    }
+  
     await this.plantRepository.save(plant);
     return this.getStatus();
   }
@@ -143,9 +156,13 @@ export class PlantService {
       world.isDaytime &&
       sunlightBonus > 0 &&
       waterBonus > 0 &&
-      fertilizerBonus > 0 &&
       this.waterService.hasWaterForGrowth(plant, world) &&
       this.fertilizerService.hasFertilizerForGrowth(plant, world);
+  
+    // ── health از sun همیشه محاسبه میشه، مستقل از canGrow ──
+    let healthDelta = 0;
+    if (sun.alignmentLabel === 'perfect') healthDelta += GROWTH.HEALTH_BONUS_SUN_PERFECT;
+    else if (sun.alignmentLabel === 'partial') healthDelta += GROWTH.HEALTH_BONUS_SUN_PARTIAL;
   
     if (!canGrow) {
       this.waterService.decayHydration(plant);
@@ -155,6 +172,8 @@ export class PlantService {
           plant.health - GROWTH.HEALTH_DECAY_PER_CYCLE,
         );
       }
+      // sun bonus حتی بدون رشد هم اعمال میشه
+      plant.health = Math.min(GROWTH.MAX_HEALTH, plant.health + healthDelta);
       await this.plantRepository.save(plant);
       return { grew: false, points: 0 };
     }
@@ -171,12 +190,11 @@ export class PlantService {
     plant.level = this.levelForPoints(plant.growthPoints);
     this.waterService.decayHydration(plant);
   
-    // health recovery — هر شرط جداگانه جمع می‌شه
+    // health recovery موقع رشد موفق
     let healthGain = GROWTH.HEALTH_FROM_GROWTH;
     if (world.isDaytime) healthGain += GROWTH.HEALTH_BONUS_DAYTIME;
     if (fertilizerBonus > 1) healthGain += GROWTH.HEALTH_BONUS_FERTILIZER;
-    if (sun.alignmentLabel === 'perfect') healthGain += GROWTH.HEALTH_BONUS_SUN_PERFECT;
-    else if (sun.alignmentLabel === 'partial') healthGain += GROWTH.HEALTH_BONUS_SUN_PARTIAL;
+    healthGain += healthDelta; // sun bonus اینجا هم اعمال میشه
   
     plant.health = Math.min(GROWTH.MAX_HEALTH, plant.health + healthGain);
     await this.plantRepository.save(plant);

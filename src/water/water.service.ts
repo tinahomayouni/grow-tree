@@ -67,10 +67,20 @@ export class WaterService {
     }
     world.currentWater -= used;
     plant.hydration = Math.min(WATER.HYDRATION_MAX, plant.hydration + used);
-    plant.health = Math.min(
-      GROWTH.MAX_HEALTH,
-      plant.health + GROWTH.HEALTH_FROM_WATER,
-    );
+  
+    // اگه overwater بود از health کم میشه، وگرنه health gain داره
+    if (plant.hydration > WATER.OVERWATER_THRESHOLD) {
+      plant.health = Math.max(
+        GROWTH.MIN_HEALTH,
+        plant.health - GROWTH.HEALTH_DECAY_PER_CYCLE,
+      );
+    } else {
+      plant.health = Math.min(
+        GROWTH.MAX_HEALTH,
+        plant.health + GROWTH.HEALTH_FROM_WATER,
+      );
+    }
+  
     return { plant, world, used };
   }
 

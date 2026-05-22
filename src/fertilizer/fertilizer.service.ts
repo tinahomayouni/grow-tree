@@ -44,14 +44,11 @@ export class FertilizerService {
     if (this.isBoostActive(plant)) {
       return FERTILIZER.BOOST_MULTIPLIER;
     }
-    if (world.availableFertilizer > 0) {
-      return 1;
-    }
-    return 0;
+    return 1; // fertilizer نبودن دیگه گیاه رو بلاک نمی‌کنه
   }
-
-  hasFertilizerForGrowth(plant: PlantEntity, world: WorldEntity): boolean {
-    return this.isBoostActive(plant) || world.availableFertilizer > 0;
+  
+  hasFertilizerForGrowth(_plant: PlantEntity, _world: WorldEntity): boolean {
+    return true; // fertilizer شرط رشد نیست، فقط bonus هست
   }
 
   isBoostActive(plant: PlantEntity): boolean {
