@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+
+    "target": "ES2023",
 
     "rootDir": "./src",
     "outDir": "./dist",
-
-    "declaration": false,
-    "sourceMap": false,
 
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -15,11 +14,16 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
-    "target": "ES2023",
-
     "skipLibCheck": true,
     "incremental": true,
-
     "forceConsistentCasingInFileNames": true
-  }
+  },
+
+  "exclude": [
+    "node_modules",
+    "test",
+    "**/*.spec.ts",
+    "**/*.e2e-spec.ts",
+    "dist"
+  ]
 }
